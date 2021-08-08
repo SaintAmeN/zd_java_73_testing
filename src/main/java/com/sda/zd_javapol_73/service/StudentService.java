@@ -28,6 +28,7 @@ public class StudentService {
 
     public StudentDto addStudent(CreateStudentRequest request) {
         log.info("Creating student from request: " + request);
+        // mapowanie obiektu CreateStudentRequest(DTO) na Student
         Student student = studentMapper.mapCreateRequestToStudent(request);
 
         student = studentRepository.save(student);

@@ -22,7 +22,7 @@ public class StudentController {
         return studentService.findAll();
     }
 
-    @PostMapping
+    @PostMapping()
     public StudentDto addStudent(@RequestBody CreateStudentRequest request){
         return studentService.addStudent(request);
     }

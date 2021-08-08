@@ -21,7 +21,8 @@ import java.util.List;
 public class GradeController {
     private final GradeService gradeService;
 
-    @GetMapping("/{studentId}")
+    // localhost:8080/api/grade/1 - wejście spowoduje wywołanie tej metody
+    @GetMapping("/{studentId}") // endpoint == mapping = adres pod który możesz wejść w przeglądarce/postman/swagger
     public List<Grade> getStudentGrades(@PathVariable(name = "studentId") Long studentId){
         return gradeService.findAllGradesByStudentId(studentId);
     }

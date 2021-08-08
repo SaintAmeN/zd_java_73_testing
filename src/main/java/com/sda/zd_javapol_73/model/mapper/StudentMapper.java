@@ -16,11 +16,12 @@ public interface StudentMapper {
     })
     Student mapCreateRequestToStudent(CreateStudentRequest request);
 
+    // ---------------------------------------------------------------
     @Mappings({
             @Mapping(target = "identifier", source = "id"),
             @Mapping(target = "name", source = "firstName"),
             @Mapping(target = "surname", source = "lastName"),
             @Mapping(target = "index", source = "indexNumber"),
     })
-    StudentDto mapStudentToStudentDto(Student request);
+    StudentDto mapStudentToStudentDto(Student source);
 }
