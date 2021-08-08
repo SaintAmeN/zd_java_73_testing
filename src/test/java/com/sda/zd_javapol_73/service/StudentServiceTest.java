@@ -8,6 +8,10 @@ import com.sda.zd_javapol_73.repository.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -84,8 +89,18 @@ public class StudentServiceTest {
         }
     }
 
+    public static Stream<Arguments> getGradesToCalculateAverage() {
+        return Stream.of(
+                Arguments.of(Arrays.asList(new Grade(null, null, 5.0, null), new Grade(null, null, 5.0, null)), 5.0),
+                Arguments.of(Arrays.asList(new Grade(null, null, 1.0, null), new Grade(null, null, 5.0, null)), 3.0),
+                Arguments.of(Arrays.asList(new Grade(null, null, 2.0, null), new Grade(null, null, 4.0, null)), 3.0),
+                Arguments.of(Arrays.asList(new Grade(null, null, 0, null), new Grade(null, null, 5.0, null)), 2.5)
+        );
+    }
+
     @Nested
     class StudentServiceGradesCalculationTests {
+
         @Test
         void caluclateGradesAverage_handlesNoAverage() {
             final long TEST_STUDENT_ID = 1L;
@@ -106,32 +121,26 @@ public class StudentServiceTest {
                 studentService.calculateGradesAverage(2L);
             });
         }
-
-        @Test()
-        void caluclateGradesAverage_properlyCalculatesAverage() {
-            final long TEST_STUDENT_ID = 3L;
-            final Student testStudent = new Student(TEST_STUDENT_ID,
-                    "Marian",
-                    "Kowalski",
-                    "12345678",
-                    LocalDate.of(2011, 1, 8),
-                    new HashSet<>(Arrays.asList(
-                            new Grade(null, null, 5.0, null),
-                            new Grade(null, null, 5.0, null),
-                            new Grade(null, null, 5.0, null),
-                            new Grade(null, null, 5.0, null),
-                            new Grade(null, null, 5.0, null)
-                    )));
-            given(studentRepository.findById(TEST_STUDENT_ID)).willReturn(Optional.of(testStudent));
-            given(gradeRepository.findAllByStudent(testStudent)).willReturn(new ArrayList<>(testStudent.getGrades()));
-
-            OptionalDouble optionalAverage = studentService.calculateGradesAverage(TEST_STUDENT_ID);
-            assertTrue(optionalAverage.isPresent());
-            assertEquals(5.0, optionalAverage.getAsDouble());
-
-            // jeśli spodziewamy się jakiegoś błędu obliczeń z akceptowalnym marginesem, to podajemy go jako 3 parametr.
-            assertEquals(5.0, optionalAverage.getAsDouble(), 0.001);
-        }
     }
 
+    @ParameterizedTest
+    @MethodSource(value = "getGradesToCalculateAverage")
+    void caluclateGradesAverage_properlyCalculatesAverage(List<Grade> grades, double expectedAverage) {
+        final long TEST_STUDENT_ID = 3L;
+        final Student testStudent = new Student(TEST_STUDENT_ID,
+                "Marian",
+                "Kowalski",
+                "12345678",
+                LocalDate.of(2011, 1, 8),
+                new HashSet<>(grades));
+        given(studentRepository.findById(TEST_STUDENT_ID)).willReturn(Optional.of(testStudent));
+        given(gradeRepository.findAllByStudent(testStudent)).willReturn(grades);
+
+        OptionalDouble optionalAverage = studentService.calculateGradesAverage(TEST_STUDENT_ID);
+        assertTrue(optionalAverage.isPresent());
+        assertEquals(expectedAverage, optionalAverage.getAsDouble());
+
+        // jeśli spodziewamy się jakiegoś błędu obliczeń z akceptowalnym marginesem, to podajemy go jako 3 parametr.
+        assertEquals(expectedAverage, optionalAverage.getAsDouble(), 0.001);
+    }
 }

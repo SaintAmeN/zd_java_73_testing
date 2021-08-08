@@ -25,13 +25,4 @@ public class Grade {
     @ManyToOne()
     private Student student;
 
-    // zarządzanie studentem CRUD
-    // zarządzanie ocenami CRUD
-    // Funkcjonalności dodatkowe:
-    //  - liczyć średnią
-    //  - szukać uczniów po roczniku (data urodzenia mówi w której jesteśmy klasie)
-    //  - listowanie i sortowanie i filtrowanie
-    //  - szukanie studenta z ocenami
-    //  - szukanie ocen studenta z danego przedmiotu
-
 }
