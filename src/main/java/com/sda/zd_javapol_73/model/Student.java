@@ -1,8 +1,6 @@
 package com.sda.zd_javapol_73.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -23,5 +21,7 @@ public class Student {
     private LocalDate dateOfBirth;
 
     @OneToMany(mappedBy = "student")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Grade> grades;
 }
